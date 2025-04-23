@@ -28,7 +28,6 @@ public class LojaService {
         void limparLoja();
         void fazerRelatorio(); // nem todo funcionário precisa disso
     }
-
     class Caixa implements Funcionario {
         public void vender() {
             System.out.println("Caixa vendendo...");
