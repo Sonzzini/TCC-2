@@ -1,0 +1,35 @@
+{
+  "LintersJava": {
+    "TestingDifferentLinters": {
+      "bin": {
+        "Vendedor.class": null,
+        "ServicoEmail.class": null,
+        "LojaService$Caixa.class": null,
+        "MetodoPagamento.class": null,
+        "LojaService$Funcionario.class": null,
+        "Limpador.class": null,
+        "Caixa.class": null,
+        "LojaService$ServicoEmail.class": null,
+        "LojaService.class": null,
+        "LojaServiceCorrigido.class": null,
+        "App.class": null,
+        "PagamentoCredito.class": null,
+        "PagamentoBoleto.class": null
+      },
+      "README.md": null,
+      "lib": {},
+      ".vscode": {
+        "settings.json": null
+      },
+      "src": {
+        "refatorado": {
+          "LojaServiceCorrigido.java": null
+        },
+        "violado": {
+          "LojaService.java": null
+        },
+        "App.java": null
+      }
+    }
+  }
+}

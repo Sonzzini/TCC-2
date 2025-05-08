@@ -74,7 +74,7 @@ class AppGUI:
 
     def exibir_json(self):
         try:
-            estrutura = self.json_manager.gerar_json(self.area_texto.get(1.0, tk.END))
+            estrutura = self.json_manager.extrair_classes_interfaces(self.area_texto.get(1.0, tk.END))
             if estrutura:
                 self.abrir_tela_json(estrutura)
         except Exception as e:
@@ -100,7 +100,7 @@ class AppGUI:
 
     def mandar_para_ia(self):
         try:
-            estruturas = self.json_manager.gerar_json(self.area_texto.get(1.0, tk.END))
+            estruturas = self.json_manager.extrair_classes_interfaces(self.area_texto.get(1.0, tk.END))
             if not estruturas:
                 return
 
