@@ -1,10 +1,11 @@
 import requests
 
 class AIManager:
-    def __init__(self, base_url="http://localhost:11434", model="codellama:13b-instruct"):
+    def __init__(self, base_url="http://localhost:11434", model="codellama:13b-instruct", debug_mode=False):
         self.base_url = base_url
         self.model = model
-        print("AIManager inicializado.")
+        if debug_mode:
+            print("AIManager inicializado.")
 
     def testar_conexao(self, prompt_teste):
         response = requests.post(
@@ -69,9 +70,6 @@ Responda no seguinte formato JSON:
         }}
     ]
 }}
-Se o status da classe for "Conforme", inclua um ✅ no campo do status.
-Se o status da classe for "Parcialmente Conforme, inclua um ⚠️ no campo do status.
-Se o status da classe for "Não Conforme", inclua um ❌ no campo do status.
 """
         elif tipo == "interface":
             prompt = f"""
@@ -102,9 +100,6 @@ Responda no seguinte formato JSON:
         }}
     ]
 }}
-Se o status da interface for "Conforme", inclua um ✅ no campo do status.
-Se o status da interface for "Parcialmente Conforme, inclua um ⚠️ no campo do status.
-Se o status da interface for "Não Conforme", inclua um ❌ no campo do status.
 """
         else:
             prompt = f"""

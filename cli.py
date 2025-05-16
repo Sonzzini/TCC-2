@@ -2,6 +2,7 @@ import sys
 import os
 from managers.json_manager import JsonManager
 from managers.ai_manager import AIManager
+import argparse
 
 def montar_estrutura_pasta(pasta):
     estrutura = {}
@@ -11,7 +12,8 @@ def montar_estrutura_pasta(pasta):
             estrutura[item] = montar_estrutura_pasta(caminho_completo)
         else:
             estrutura[item] = None
-    print(f"📁 Estrutura da pasta '{pasta}': {estrutura}")
+    if debug_mode:
+        print(f"📁 Estrutura da pasta '{pasta}': {estrutura}")
     return estrutura
 
 def gerar_estrutura_projeto(caminhos_arquivos):
@@ -28,10 +30,11 @@ def gerar_estrutura_projeto(caminhos_arquivos):
             nome_pasta = os.path.basename(caminho)
             estrutura[nome_pasta] = montar_estrutura_pasta(caminho)
 
-    print(f"💾 Estrutura do projeto: {estrutura}")
+    if debug_mode:
+        print(f"💾 Estrutura do projeto: {estrutura}")
     return estrutura
 
-def processar_arquivos_cli(caminhos_arquivos):
+def processar_arquivos_cli(caminhos_arquivos, debug_mode=False):
     arquivos_validos = []
 
     for caminho in caminhos_arquivos:
@@ -47,19 +50,23 @@ def processar_arquivos_cli(caminhos_arquivos):
         print("⚠️ Nenhum arquivo .java válido fornecido.")
         return
 
-    print("\n✅ Arquivos .java encontrados:")
-    for arq in arquivos_validos:
-        print(f"- {arq}")
+    if debug_mode:
+        print("\n✅ Arquivos .java encontrados:")
+        for arq in arquivos_validos:
+            print(f"- {arq}")
 
     estrutura = gerar_estrutura_projeto(caminhos_arquivos)
 
-    with open("estrutura_projeto.json", "w", encoding="utf-8") as f:
-        import json
-        json.dump(estrutura, f, indent=2, ensure_ascii=False)
-    print("\n📁 Estrutura do projeto salva em 'estrutura_projeto.json'.")
+    if debug_mode:
+        with open("estrutura_projeto.json", "w", encoding="utf-8") as f:
+            import json
+            json.dump(estrutura, f, indent=2, ensure_ascii=False)
+        print("\n📁 Estrutura do projeto salva em 'estrutura_projeto.json'.")
 
-    json_manager = JsonManager()
-    ai_manager = AIManager()
+    print("\n🔍 Analisando arquivos...")
+
+    json_manager = JsonManager(debug_mode=debug_mode)
+    ai_manager = AIManager(debug_mode=debug_mode)
 
     conteudo_total = ""
     for caminho in arquivos_validos:
@@ -73,9 +80,10 @@ def processar_arquivos_cli(caminhos_arquivos):
 
     estruturas = json_manager.extrair_classes_interfaces_javalang(conteudo_total)
 
-    print(f"JSON gerado: {estruturas}")
+    if debug_mode:
+        print(f"JSON gerado: {estruturas}")
 
-    analise_por_classe(estruturas, ai_manager)
+    analise_por_classe(estruturas, ai_manager, debug_mode)
 
 def analise_por_metodos(estruturas, ai_manager: AIManager):
     for estrutura in estruturas:
@@ -92,13 +100,16 @@ def analise_por_metodos(estruturas, ai_manager: AIManager):
             except Exception as e:
                 print(f"⚠️ Erro ao analisar {nome_metodo}: {e}")
 
-def analise_por_classe(estruturas, ai_manager: AIManager):
+def analise_por_classe(estruturas, ai_manager: AIManager, debug_mode=False):
     for estrutura in estruturas:
 
         nome_classe = estrutura.get("name", "ClasseDesconhecida")
 
         prompt, tipo = ai_manager.gerar_prompt_classe(estrutura)
-        #print(f"📝 Prompt gerado {"-" * 100} \n{prompt}\n {"-" * 100}")
+
+        if debug_mode:
+            print(f"📝 Prompt gerado:\n{'-' * 100}\n{prompt}\n{'-' * 100}")
+
         try:
             resposta = ai_manager.analisar_classe(prompt)
             print(f"\n🔹 {tipo.capitalize()}: {nome_classe}\n{resposta}\n")
@@ -106,7 +117,14 @@ def analise_por_classe(estruturas, ai_manager: AIManager):
             print(f"⚠️ Erro ao analisar {nome_classe}: {e}")
 
 if __name__ == "__main__":
-    if len(sys.argv) <= 1:
-        print("Uso: python3 cli.py <arquivo1.java> <arquivo2.java> ou <caminho_do_projeto_java> ...")
-    else:
-        processar_arquivos_cli(sys.argv[1:])
+    parser = argparse.ArgumentParser(description="Ferramenta de análise de classes e interfaces Java com IA.")
+    parser.add_argument("caminhos", nargs="+", help="Arquivos ou diretórios .java a serem analisados.")
+    parser.add_argument("--debug", action="store_true", help="Exibe informações detalhadas de depuração.")
+
+    args = parser.parse_args()
+    debug_mode = args.debug
+
+    if debug_mode:
+        print("🔧 Modo de depuração ativado.")
+
+    processar_arquivos_cli(args.caminhos, debug_mode)

@@ -2,8 +2,9 @@ import javalang
 
 class JsonManager:
 
-    def __init__(self):
-        print("JsonManager inicializado.")
+    def __init__(self, debug_mode=False):
+        if debug_mode:
+            print("JsonManager inicializado.")
     
     def javalang_parser(self, codigo_java: str):
         try:
