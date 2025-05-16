@@ -11,6 +11,7 @@ def montar_estrutura_pasta(pasta):
             estrutura[item] = montar_estrutura_pasta(caminho_completo)
         else:
             estrutura[item] = None
+    print(f"📁 Estrutura da pasta '{pasta}': {estrutura}")
     return estrutura
 
 def gerar_estrutura_projeto(caminhos_arquivos):
@@ -27,6 +28,7 @@ def gerar_estrutura_projeto(caminhos_arquivos):
             nome_pasta = os.path.basename(caminho)
             estrutura[nome_pasta] = montar_estrutura_pasta(caminho)
 
+    print(f"💾 Estrutura do projeto: {estrutura}")
     return estrutura
 
 def processar_arquivos_cli(caminhos_arquivos):
@@ -71,25 +73,40 @@ def processar_arquivos_cli(caminhos_arquivos):
 
     estruturas = json_manager.extrair_classes_interfaces_javalang(conteudo_total)
 
-    print(estruturas)
+    print(f"JSON gerado: {estruturas}")
 
+    analise_por_classe(estruturas, ai_manager)
+
+def analise_por_metodos(estruturas, ai_manager: AIManager):
     for estrutura in estruturas:
-        nome_classe = estrutura.get("name", "ClasseDesconhecida")
+        nome_classe_interface = estrutura.get("name", "ClasseDesconhecida")
         metodos = estrutura.get("methods", {})
 
-        print(f"\n📘 Classe: {nome_classe}")
+        print(f"\n📘 Classe/Interface: {nome_classe_interface}")
         for nome_metodo, dados in metodos.items():
             assinatura = dados.get("signature", "")
             corpo = "\n".join(dados.get("body", []))
             try:
-                resposta = ai_manager.analisar_metodo(nome_classe, nome_metodo, assinatura, corpo)
+                resposta = ai_manager.analisar_metodo(nome_classe_interface, nome_metodo, assinatura, corpo)
                 print(f"\n🔹 Método: {nome_metodo}\n{resposta}\n")
             except Exception as e:
                 print(f"⚠️ Erro ao analisar {nome_metodo}: {e}")
 
+def analise_por_classe(estruturas, ai_manager: AIManager):
+    for estrutura in estruturas:
+
+        nome_classe = estrutura.get("name", "ClasseDesconhecida")
+
+        prompt, tipo = ai_manager.gerar_prompt_classe(estrutura)
+        #print(f"📝 Prompt gerado {"-" * 100} \n{prompt}\n {"-" * 100}")
+        try:
+            resposta = ai_manager.analisar_classe(prompt)
+            print(f"\n🔹 {tipo.capitalize()}: {nome_classe}\n{resposta}\n")
+        except Exception as e:
+            print(f"⚠️ Erro ao analisar {nome_classe}: {e}")
+
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
-        print("Uso: python cli.py <arquivo1.java> <arquivo2.java> ...")
+        print("Uso: python3 cli.py <arquivo1.java> <arquivo2.java> ou <caminho_do_projeto_java> ...")
     else:
         processar_arquivos_cli(sys.argv[1:])
-    
