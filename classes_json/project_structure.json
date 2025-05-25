@@ -1,0 +1,242 @@
+[
+    {
+        "type": "class",
+        "name": "AppTest",
+        "methods": {
+            "appHasAGreeting": {
+                "signature": "package-private appHasAGreeting(())",
+                "body": "    @Test void appHasAGreeting() {\n\n        App classUnderTest = new App();\n\n        assertNotNull(classUnderTest.getGreeting(), \"app should have a greeting\");\n\n    }\n"
+            }
+        },
+        "attributes": []
+    },
+    {
+        "type": "class",
+        "name": "App",
+        "methods": {
+            "getGreeting": {
+                "signature": "package-private getGreeting(())",
+                "body": "    public String getGreeting() {\n\n        return \"Hello World!\";\n\n    }\n"
+            },
+            "main": {
+                "signature": "package-private main((String[]args))",
+                "body": "    public static void main(String[] args) {\n\n        System.out.println(new App().getGreeting());\n\n    }\n"
+            }
+        },
+        "attributes": []
+    },
+    {
+        "type": "class",
+        "name": "Weather",
+        "methods": {
+            "getTemperature": {
+                "signature": "package-private getTemperature(())",
+                "body": "    public double getTemperature() {\n\n        return temperature;\n\n    }\n"
+            },
+            "setTemperature": {
+                "signature": "package-private setTemperature((doubletemperature))",
+                "body": "    public void setTemperature(double temperature) {\n\n        this.temperature = temperature;\n\n    }\n"
+            },
+            "getFeelsLike": {
+                "signature": "package-private getFeelsLike(())",
+                "body": "    public double getFeelsLike() {\n\n        return feelsLike;\n\n    }\n"
+            },
+            "setFeelsLike": {
+                "signature": "package-private setFeelsLike((doublefeelsLike))",
+                "body": "    public void setFeelsLike(double feelsLike) {\n\n        this.feelsLike = feelsLike;\n\n    }\n"
+            },
+            "getPressure": {
+                "signature": "package-private getPressure(())",
+                "body": "    public int getPressure() {\n\n        return pressure;\n\n    }\n"
+            },
+            "setPressure": {
+                "signature": "package-private setPressure((intpressure))",
+                "body": "    public void setPressure(int pressure) {\n\n        this.pressure = pressure;\n\n    }\n"
+            },
+            "getHumidity": {
+                "signature": "package-private getHumidity(())",
+                "body": "    public int getHumidity() {\n\n        return humidity;\n\n    }\n"
+            },
+            "setHumidity": {
+                "signature": "package-private setHumidity((inthumidity))",
+                "body": "    public void setHumidity(int humidity) {\n\n        this.humidity = humidity;\n\n    }\n"
+            },
+            "getClouds": {
+                "signature": "package-private getClouds(())",
+                "body": "    public int getClouds() {\n\n        return clouds;\n\n    }\n"
+            },
+            "setClouds": {
+                "signature": "package-private setClouds((intclouds))",
+                "body": "    public void setClouds(int clouds) {\n\n        this.clouds = clouds;\n\n    }\n"
+            },
+            "getVisibility": {
+                "signature": "package-private getVisibility(())",
+                "body": "    public int getVisibility() {\n\n        return visibility;\n\n    }\n"
+            },
+            "setVisibility": {
+                "signature": "package-private setVisibility((intvisibility))",
+                "body": "    public void setVisibility(int visibility) {\n\n        this.visibility = visibility;\n\n    }\n"
+            },
+            "getDate": {
+                "signature": "package-private getDate(())",
+                "body": "    public LocalDate getDate() {\n\n        return date;\n\n    }\n"
+            },
+            "setDate": {
+                "signature": "package-private setDate((LocalDatedate))",
+                "body": "    public void setDate(LocalDate date) {\n\n        this.date = date;\n\n    }\n"
+            }
+        },
+        "attributes": [
+            {
+                "name": "temperature",
+                "type": "double",
+                "visibility": "package-private"
+            },
+            {
+                "name": "feelsLike",
+                "type": "double",
+                "visibility": "package-private"
+            },
+            {
+                "name": "pressure",
+                "type": "int",
+                "visibility": "package-private"
+            },
+            {
+                "name": "humidity",
+                "type": "int",
+                "visibility": "package-private"
+            },
+            {
+                "name": "clouds",
+                "type": "int",
+                "visibility": "package-private"
+            },
+            {
+                "name": "visibility",
+                "type": "int",
+                "visibility": "package-private"
+            },
+            {
+                "name": "date",
+                "type": "LocalDate",
+                "visibility": "package-private"
+            }
+        ]
+    },
+    {
+        "type": "class",
+        "name": "DataManager",
+        "methods": {
+            "isWeatherSaved": {
+                "signature": "package-private isWeatherSaved((LocalDatedate))",
+                "body": "    public boolean isWeatherSaved(LocalDate date) {\n\n        String query = \"SELECT 1 FROM weather WHERE date = ?\";\n\n        try (Connection connection = DriverManager.getConnection(DB_URL);\n\n             PreparedStatement statement = connection.prepareStatement(query)) {\n\n            statement.setString(1, date.toString());\n\n            try (ResultSet resultSet = statement.executeQuery()) {\n\n                return resultSet.next();\n\n            }\n\n        } catch (SQLException e) {\n\n            LoggerManager.log(\"Error checking weather in database: \" + e.getMessage());\n\n        }\n\n        return false;\n\n    }\n"
+            },
+            "saveWeather": {
+                "signature": "package-private saveWeather((Weatherweather))",
+                "body": "    public void saveWeather(Weather weather) {\n\n        String insertSQL = \"INSERT INTO weather (date, temperature, feels_like, pressure, humidity, clouds, visibility) \" +\n\n                \"VALUES (?, ?, ?, ?, ?, ?, ?)\";\n\n        try (Connection connection = DriverManager.getConnection(DB_URL);\n\n             PreparedStatement statement = connection.prepareStatement(insertSQL)) {\n\n            statement.setString(1, weather.getDate().toString());\n\n            statement.setDouble(2, weather.getTemperature());\n\n            statement.setDouble(3, weather.getFeelsLike());\n\n            statement.setInt(4, weather.getPressure());\n\n            statement.setInt(5, weather.getHumidity());\n\n            statement.setInt(6, weather.getClouds());\n\n            statement.setInt(7, weather.getVisibility());\n\n            statement.executeUpdate();\n\n        } catch (SQLException e) {\n\n            LoggerManager.log(\"Error saving weather to database: \" + e.getMessage());\n\n        }\n\n    }\n"
+            },
+            "fetchData": {
+                "signature": "package-private fetchData(())",
+                "body": "    public String fetchData() {\n\n        // Placeholder for fetching data from the database\n\n        LoggerManager.log(\"Fetching data from database...\");\n\n        return \"Sample Data from Database\";\n\n    }\n"
+            },
+            "saveData": {
+                "signature": "package-private saveData((Stringdata))",
+                "body": "    public void saveData(String data) {\n\n        // Placeholder for saving data to the database\n\n        LoggerManager.log(\"Saving data to database: \" + data);\n\n    }\n"
+            }
+        },
+        "attributes": [
+            {
+                "name": "DB_URL",
+                "type": "String",
+                "visibility": "package-private"
+            }
+        ]
+    },
+    {
+        "type": "class",
+        "name": "NetworkManager",
+        "methods": {
+            "fetchDataFromNetwork": {
+                "signature": "package-private fetchDataFromNetwork(())",
+                "body": "    public String fetchDataFromNetwork() {\n\n        // Placeholder for network operations (e.g., API calls)\n\n        LoggerManager.log(\"Fetching data from network...\");\n\n        return \"Network Data\";\n\n    }\n"
+            },
+            "sendDataToNetwork": {
+                "signature": "package-private sendDataToNetwork((Stringdata))",
+                "body": "    public void sendDataToNetwork(String data) {\n\n        // Placeholder for sending data over the network\n\n        LoggerManager.log(\"Sending data to network: \" + data);\n\n    }\n"
+            },
+            "fetchCurrentWeather": {
+                "signature": "package-private fetchCurrentWeather((Stringcity,Stringcountry))",
+                "body": "    public Weather fetchCurrentWeather(String city, String country) {\n\n        try {\n\n            String urlString = String.format(\"%s?q=%s,%s&APPID=%s\", API_URL, city, country, API_KEY);\n\n            URL url = new URL(urlString);\n\n            HttpURLConnection connection = (HttpURLConnection) url.openConnection();\n\n            connection.setRequestMethod(\"GET\");\n\n\n\n            int responseCode = connection.getResponseCode();\n\n            if (responseCode == 200) {\n\n                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));\n\n                StringBuilder response = new StringBuilder();\n\n                String line;\n\n                while ((line = in.readLine()) != null) {\n\n                    response.append(line);\n\n                }\n\n                in.close();\n\n\n\n                JSONObject jsonResponse = new JSONObject(response.toString());\n\n                JSONObject main = jsonResponse.getJSONObject(\"main\");\n\n                JSONObject weatherDetails = jsonResponse.getJSONArray(\"weather\").getJSONObject(0);\n\n\n\n                double temp = main.getDouble(\"temp\");\n\n                double feelsLike = main.getDouble(\"feels_like\");\n\n                int pressure = main.getInt(\"pressure\");\n\n                int humidity = main.getInt(\"humidity\");\n\n                int clouds = jsonResponse.getJSONObject(\"clouds\").getInt(\"all\");\n\n                int visibility = jsonResponse.getInt(\"visibility\");\n\n                LocalDate date = LocalDate.now();\n\n\n\n                return new Weather(temp, feelsLike, pressure, humidity, clouds, visibility, date);\n\n            } else {\n\n                LoggerManager.log(\"Failed to fetch weather data. Response code: \" + responseCode);\n\n            }\n\n        } catch (Exception e) {\n\n            LoggerManager.log(\"Error fetching weather data: \" + e.getMessage());\n\n        }\n\n        return null;\n\n    }\n"
+            }
+        },
+        "attributes": [
+            {
+                "name": "API_URL",
+                "type": "String",
+                "visibility": "package-private"
+            },
+            {
+                "name": "API_KEY",
+                "type": "String",
+                "visibility": "package-private"
+            }
+        ]
+    },
+    {
+        "type": "class",
+        "name": "ViewModel",
+        "methods": {
+            "getData": {
+                "signature": "package-private getData(())",
+                "body": "    public String getData() {\n\n        // Fetch data from DataManagerInterface\n\n        return dataManager.fetchData();\n\n    }\n"
+            },
+            "getNetworkData": {
+                "signature": "package-private getNetworkData(())",
+                "body": "    public String getNetworkData() {\n\n        // Fetch data from NetworkManager\n\n        return networkManager.fetchDataFromNetwork();\n\n    }\n"
+            },
+            "saveData": {
+                "signature": "package-private saveData((Stringdata))",
+                "body": "    public void saveData(String data) {\n\n        // Save data using DataManagerInterface\n\n        dataManager.saveData(data);\n\n    }\n"
+            },
+            "sendData": {
+                "signature": "package-private sendData((Stringdata))",
+                "body": "    public void sendData(String data) {\n\n        // Send data using NetworkManager\n\n        networkManager.sendDataToNetwork(data);\n\n    }\n"
+            }
+        },
+        "attributes": [
+            {
+                "name": "dataManager",
+                "type": "DataManagerInterface",
+                "visibility": "package-private"
+            },
+            {
+                "name": "networkManager",
+                "type": "NetworkManagerInterface",
+                "visibility": "package-private"
+            }
+        ]
+    },
+    {
+        "type": "class",
+        "name": "App",
+        "methods": {
+            "main": {
+                "signature": "package-private main((String[]args))",
+                "body": "    public static void main(String[] args) {\n\n        SwingUtilities.invokeLater(() -> {\n\n            try {\n\n                // Initialize the main application window\n\n                JFrame frame = new JFrame(\"Weather Application\");\n\n                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\n\n                frame.setSize(400, 300);\n\n\n\n                // Create instances of DataManager, NetworkManager, and ViewModel\n\n                DataManager dataManager = new DataManager();\n\n                NetworkManager networkManager = new NetworkManager();\n\n                ViewModel viewModel = new ViewModel(dataManager, networkManager);\n\n\n\n                // Create UI components\n\n                JPanel panel = new JPanel(new GridLayout(4, 1));\n\n                JLabel label = new JLabel(\"Weather Application\", SwingConstants.CENTER);\n\n                JButton fetchDataButton = new JButton(\"Fetch Data\");\n\n                JButton fetchNetworkDataButton = new JButton(\"Fetch Network Data\");\n\n                JButton fetchWeatherButton = new JButton(\"Fetch Weather\");\n\n\n\n                // Add action listeners to buttons\n\n                fetchDataButton.addActionListener((ActionEvent e) -> {\n\n                    String data = viewModel.getData();\n\n                    JOptionPane.showMessageDialog(frame, \"Data: \" + data);\n\n                });\n\n\n\n                fetchNetworkDataButton.addActionListener((ActionEvent e) -> {\n\n                    String networkData = viewModel.getNetworkData();\n\n                    JOptionPane.showMessageDialog(frame, \"Network Data: \" + networkData);\n\n                });\n\n\n\n                fetchWeatherButton.addActionListener(e -> {\n\n                    String city = \"London\"; // Example city\n\n                    String country = \"uk\"; // Example country\n\n\n\n                    Weather weather = networkManager.fetchCurrentWeather(city, country);\n\n                    if (weather != null) {\n\n                        if (!dataManager.isWeatherSaved(weather.getDate())) {\n\n                            dataManager.saveWeather(weather);\n\n                            JOptionPane.showMessageDialog(frame, \"Weather data saved for: \" + weather.getDate());\n\n                        } else {\n\n                            JOptionPane.showMessageDialog(frame, \"Weather data for today is already saved.\");\n\n                        }\n\n                    } else {\n\n                        JOptionPane.showMessageDialog(frame, \"Failed to fetch weather data.\");\n\n                    }\n\n                });\n\n\n\n                // Add components to the panel\n\n                panel.add(label);\n\n                panel.add(fetchDataButton);\n\n                panel.add(fetchNetworkDataButton);\n\n                panel.add(fetchWeatherButton);\n\n\n\n                // Add panel to the frame\n\n                frame.add(panel);\n\n\n\n                // Make the frame visible\n\n                frame.setVisible(true);\n\n            } catch (Exception e) {\n\n                LoggerManager.log(\"Error initializing the application: \" + e.getMessage());\n\n            }\n\n        });\n\n    }\n"
+            }
+        },
+        "attributes": []
+    },
+    {
+        "type": "class",
+        "name": "LoggerManager",
+        "methods": {
+            "log": {
+                "signature": "package-private log((Stringmessage))",
+                "body": "    public static void log(String message) {\n\n        System.out.println(\"[\" + LocalDateTime.now() + \"] \" + message);\n\n    }\n"
+            }
+        },
+        "attributes": []
+    }
+]

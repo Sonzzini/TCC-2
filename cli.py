@@ -12,8 +12,7 @@ def montar_estrutura_pasta(pasta):
             estrutura[item] = montar_estrutura_pasta(caminho_completo)
         else:
             estrutura[item] = None
-    if debug_mode:
-        print(f"📁 Estrutura da pasta '{pasta}': {estrutura}")
+
     return estrutura
 
 def gerar_estrutura_projeto(caminhos_arquivos):
@@ -30,8 +29,6 @@ def gerar_estrutura_projeto(caminhos_arquivos):
             nome_pasta = os.path.basename(caminho)
             estrutura[nome_pasta] = montar_estrutura_pasta(caminho)
 
-    if debug_mode:
-        print(f"💾 Estrutura do projeto: {estrutura}")
     return estrutura
 
 def processar_arquivos_cli(caminhos_arquivos, debug_mode=False):
@@ -63,8 +60,6 @@ def processar_arquivos_cli(caminhos_arquivos, debug_mode=False):
             json.dump(estrutura, f, indent=2, ensure_ascii=False)
         print("\n📁 Estrutura do projeto salva em 'estrutura_projeto.json'.")
 
-    print("\n🔍 Analisando arquivos...")
-
     json_manager = JsonManager(debug_mode=debug_mode)
     ai_manager = AIManager(debug_mode=debug_mode)
 
@@ -78,10 +73,10 @@ def processar_arquivos_cli(caminhos_arquivos, debug_mode=False):
         except Exception as e:
             print(f"❌ Erro ao abrir {caminho}:\n{e}")
 
-    estruturas = json_manager.extrair_classes_interfaces_javalang(conteudo_total)
+    estrutura_projeto = args.caminhos[0]
+    estruturas = json_manager.extrair_classes_interfaces_com_antlr(estrutura_projeto)
 
-    if debug_mode:
-        print(f"JSON gerado: {estruturas}")
+    print(f"📁 JSON salvo em classes_json/project_structure.json")
 
     analise_por_classe(estruturas, ai_manager, debug_mode)
 
@@ -111,7 +106,7 @@ def analise_por_classe(estruturas, ai_manager: AIManager, debug_mode=False):
             print(f"📝 Prompt gerado:\n{'-' * 100}\n{prompt}\n{'-' * 100}")
 
         try:
-            resposta = ai_manager.analisar_classe(prompt)
+            resposta = ai_manager.analisar_classe(prompt, class_name=nome_classe)
             print(f"\n🔹 {tipo.capitalize()}: {nome_classe}\n{resposta}\n")
         except Exception as e:
             print(f"⚠️ Erro ao analisar {nome_classe}: {e}")
